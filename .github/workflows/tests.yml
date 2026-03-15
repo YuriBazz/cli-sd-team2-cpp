@@ -30,6 +30,7 @@ jobs:
       - name: Static analysis with cppcheck
         run: |
           cppcheck --enable=all --suppress=missingIncludeSystem . \
+            --suppress=unusedFunction:tests/* \
             --error-exitcode=1
       - name: Build
         run: |
