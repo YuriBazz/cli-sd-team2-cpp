@@ -1,0 +1,43 @@
+name: Test
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+jobs:
+  lint:
+    run-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            g++ \
+            make \
+            clang-format \
+            clang-tidy \
+            cppcheck
+      - name: Check code formatting
+        run: |
+          find . -name '*.cpp' -o -name '*.h' | xargs clang-format -style=file -i
+          git diff --exit-code || (echo "Code not formatted properly. Run clang-format!" && exit 1)
+      - name: Static analysis with cppcheck
+        run: |
+          cppcheck --enable=all --suppress=missingIncludeSystem . \
+            --error-exitcode=1
+      - name: Build
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          make -j$(nproc)
+      - name: Run tests
+        run: |
+          cd build
+          ctest --output-on-failure
