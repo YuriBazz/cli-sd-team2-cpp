@@ -29,6 +29,10 @@
 
 ## Начало работы
 
+### Архитектура разрабатываемого приложения
+
+![schema](bash.png)
+
 ### Предварительные требования
 
 * C++ standart 17.
@@ -41,8 +45,8 @@
 
 ```bash
 # Клонирование репозитория
-git clone https://github.com/username/project.git
-cd project
+git clone https://github.com/YuriBazz/cli-sd-team2-cpp.git
+cd cli-sd-team2-cpp
 
 # Создание директории для сборки
 mkdir build && cd build
@@ -52,7 +56,7 @@ cmake ..
 make -j$(nproc)
 
 # Запуск программы
-./bin/MyProject
+./bin/Bash
 ```
 
 ##### Способ 2: Прямая компиляция g++
