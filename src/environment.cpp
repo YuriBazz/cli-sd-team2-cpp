@@ -1,10 +1,9 @@
 #include "environment.hpp"
+
 #include <cstdlib>
 #include <cstring>
 
-Environment::Environment() {
-    loadEnv();
-}
+Environment::Environment() { loadEnv(); }
 
 void Environment::loadEnv() {
     extern char** environ;
@@ -24,9 +23,7 @@ std::string Environment::get(const std::string& var) const {
     return "";
 }
 
-void Environment::set(const std::string& var, const std::string& value) {
-    variables[var] = value;
-}
+void Environment::set(const std::string& var, const std::string& value) { variables[var] = value; }
 
 std::string Environment::expand(const Argument* arg) const {
     if (arg->type == Argument::VARIABLE) {

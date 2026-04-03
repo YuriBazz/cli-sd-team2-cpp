@@ -5,12 +5,13 @@
 #include "environment.hpp"
 
 class Executor {
-public:
+   public:
     Executor(Environment& env) : env(env) {}
     void execute(Statement* stmt);
-    
+
     bool shouldExit() const { return env.shouldExit(); }
-private:
+
+   private:
     Environment& env;
 };
 

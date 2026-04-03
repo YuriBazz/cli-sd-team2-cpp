@@ -1,7 +1,7 @@
-#include "parser.tab.h"
 #include "ast.hpp"
 #include "environment.hpp"
 #include "executor.hpp"
+#include "parser.tab.h"
 
 extern FILE* yyin;
 Executor* g_executor = nullptr;

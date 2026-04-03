@@ -1,7 +1,9 @@
 #include "ast.hpp"
-#include "environment.hpp"
-#include <unistd.h>
+
 #include <sys/wait.h>
+#include <unistd.h>
+
+#include "environment.hpp"
 
 void Assignment::execute(Environment& env) {
     if (args->empty()) {

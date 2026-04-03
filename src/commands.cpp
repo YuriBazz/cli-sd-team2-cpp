@@ -1,17 +1,16 @@
-#include "ast.hpp"
-#include "environment.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstring>
-#include <unistd.h>
-#include <vector>
-#include <algorithm>
-#include <regex>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include <algorithm>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <regex>
+#include <sstream>
 #include <vector>
+
+#include "ast.hpp"
+#include "environment.hpp"
 
 static std::vector<std::string> expandArgs(ArgumentList* args, const Environment& env) {
     std::vector<std::string> result;
@@ -94,7 +93,7 @@ void WcCommand::execute(Environment& env, int inputFd, int outputFd) {
             continue;
         }
         std::string content((std::istreambuf_iterator<char>(file)),
-                             std::istreambuf_iterator<char>());
+                            std::istreambuf_iterator<char>());
         size_t lines = std::count(content.begin(), content.end(), '\n');
         size_t words = 0;
         bool inWord = false;
@@ -145,11 +144,15 @@ void GrepCommand::execute(Environment& env, int inputFd, int outputFd) {
 
     for (size_t i = 0; i < args.size(); ++i) {
         const std::string& arg = args[i];
-        if (arg == "-i") opt_i = true;
-        else if (arg == "-c") opt_c = true;
-        else if (arg == "-l") opt_l = true;
-        else if (arg == "-w") opt_w = true;
-        else if (arg == "-A" && i+1 < args.size()) {
+        if (arg == "-i")
+            opt_i = true;
+        else if (arg == "-c")
+            opt_c = true;
+        else if (arg == "-l")
+            opt_l = true;
+        else if (arg == "-w")
+            opt_w = true;
+        else if (arg == "-A" && i + 1 < args.size()) {
             opt_A = std::stoi(args[++i]);
         } else if (pattern.empty()) {
             pattern = arg;
@@ -219,8 +222,8 @@ void GrepCommand::execute(Environment& env, int inputFd, int outputFd) {
                 write(outputFd, out.c_str(), out.size());
 
                 if (opt_A > 0) {
-                    for (int k = 1; k <= opt_A && i+k < lines.size(); ++k) {
-                        std::string ctx = "-" + lines[i+k] + "\n";
+                    for (int k = 1; k <= opt_A && i + k < lines.size(); ++k) {
+                        std::string ctx = "-" + lines[i + k] + "\n";
                         write(outputFd, ctx.c_str(), ctx.size());
                     }
                 }
@@ -258,13 +261,13 @@ void GrepCommand::execute(Environment& env, int inputFd, int outputFd) {
 void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     std::vector<std::string> args = expandArgs(this->args, env);
     args.insert(args.begin(), command);
-    
+
     std::vector<char*> argv;
     for (auto& arg : args) {
         argv.push_back(const_cast<char*>(arg.c_str()));
     }
     argv.push_back(nullptr);
-    
+
     if (inputFd != 0) {
         dup2(inputFd, STDIN_FILENO);
         close(inputFd);
@@ -273,13 +276,13 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
         dup2(outputFd, STDOUT_FILENO);
         close(outputFd);
     }
-    
+
     for (const auto& pair : env.getVariables()) {
         setenv(pair.first.c_str(), pair.second.c_str(), 1);
     }
-    
+
     execvp(argv[0], argv.data());
-    
+
     std::string err = "external command failed: " + command + "\n";
     write(STDERR_FILENO, err.c_str(), err.size());
     exit(127);

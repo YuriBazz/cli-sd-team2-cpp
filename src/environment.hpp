@@ -3,10 +3,11 @@
 
 #include <string>
 #include <unordered_map>
+
 #include "ast.hpp"
 
 class Environment {
-public:
+   public:
     Environment();
     std::string get(const std::string& var) const;
     void set(const std::string& var, const std::string& value);
@@ -15,7 +16,8 @@ public:
     bool shouldExit() const { return exitFlag; }
     void setExit(bool flag) { exitFlag = flag; }
     const std::unordered_map<std::string, std::string>& getVariables() const { return variables; }
-private:
+
+   private:
     std::unordered_map<std::string, std::string> variables;
     bool exitFlag = false;
 };
