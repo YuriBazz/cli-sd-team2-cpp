@@ -1,9 +1,9 @@
 add_executable(bash_tests
-    test_main.cpp
-    test_module1.cpp
+    test_example.cpp
+#    test_module1.cpp
 )
 
-target_link_libraries(bash_tests PRIVATE ${PROJECT_NAME})
+target_link_libraries(bash_tests bash_lib gtest_main)
 
 target_include_directories(bash_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src

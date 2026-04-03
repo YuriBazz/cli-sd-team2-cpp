@@ -22,7 +22,9 @@ jobs:
             make \
             clang-format \
             clang-tidy \
-            cppcheck
+            cppcheck \
+            flex \
+            bison
       - name: Check code formatting
         run: |
           find . -name '*.cpp' -o -name '*.h' | xargs clang-format -style=file -i
