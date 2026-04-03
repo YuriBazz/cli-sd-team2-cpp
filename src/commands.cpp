@@ -12,12 +12,12 @@
 #include "ast.hpp"
 #include "environment.hpp"
 
-static std::vector<std::string> expandArgs(ArgumentList* args, const Environment& env) {
+static std::vector<std::string> expandArgs(const ArgumentList* args, const Environment& env) {
     std::vector<std::string> result;
     if (!args) return result;
-    for (auto arg : *args) {
-        result.push_back(env.expand(arg));
-    }
+    std::transform(args->begin(), args->end(),
+               std::back_inserter(result),
+               [&](const auto* arg) { return env.expand(arg); });
     return result;
 }
 
@@ -263,9 +263,9 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     args.insert(args.begin(), command);
 
     std::vector<char*> argv;
-    for (auto& arg : args) {
-        argv.push_back(const_cast<char*>(arg.c_str()));
-    }
+    argv.reserve(args.size() + 1);  // опционально: избегаем лишних перевыделений памяти
+    std::transform(args.begin(), args.end(), std::back_inserter(argv),
+                [](auto& arg) { return const_cast<char*>(arg.c_str()); });
     argv.push_back(nullptr);
 
     if (inputFd != 0) {

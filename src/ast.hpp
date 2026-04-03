@@ -48,7 +48,7 @@ class Command : public Statement {
 class Pipeline : public Statement {
    public:
     std::vector<Command*> commands;
-    Pipeline(const std::vector<Command*>& cmds) : commands(cmds) {}
+    explicit Pipeline(const std::vector<Command*>& cmds) : commands(cmds) {}
     ~Pipeline() {
         for (auto c : commands) delete c;
     }
@@ -57,37 +57,37 @@ class Pipeline : public Statement {
 
 class CatCommand : public Command {
    public:
-    CatCommand(ArgumentList* a) : Command(a) {}
+    explicit CatCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
 class EchoCommand : public Command {
    public:
-    EchoCommand(ArgumentList* a) : Command(a) {}
+    explicit EchoCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
 class WcCommand : public Command {
    public:
-    WcCommand(ArgumentList* a) : Command(a) {}
+    explicit WcCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
 class PwdCommand : public Command {
    public:
-    PwdCommand(ArgumentList* a) : Command(a) {}
+    explicit PwdCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
 class ExitCommand : public Command {
    public:
-    ExitCommand(ArgumentList* a) : Command(a) {}
+    explicit ExitCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
 class GrepCommand : public Command {
    public:
-    GrepCommand(ArgumentList* a) : Command(a) {}
+    explicit GrepCommand(ArgumentList* a) : Command(a) {}
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
