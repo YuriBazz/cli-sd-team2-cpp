@@ -6,7 +6,7 @@
 
 class Executor {
    public:
-    Executor(Environment& env) : env(env) {}
+    explicit Executor(Environment& env) : env(env) {}
     void execute(Statement* stmt);
 
     bool shouldExit() const { return env.shouldExit(); }
