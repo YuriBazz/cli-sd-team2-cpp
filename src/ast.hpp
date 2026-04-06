@@ -11,6 +11,7 @@ struct Argument {
     Type type;
     std::string value;
     Argument(Type t, const char* v) : type(t), value(v ? v : "") {}
+    virtual ~Argument() = default;
 };
 
 using ArgumentList = std::vector<Argument*>;
@@ -27,8 +28,10 @@ class Assignment : public Statement {
     ArgumentList* args;
     Assignment(const std::string& name, ArgumentList* a) : varName(name), args(a) {}
     ~Assignment() {
-        for (auto a : *args) delete a;
-        delete args;
+        if (args) {
+            for (auto a : *args) delete a;
+            delete args;
+        }
     }
     void execute(Environment& env) override;
 };
@@ -38,8 +41,10 @@ class Command : public Statement {
     ArgumentList* args;
     Command(ArgumentList* a) : args(a) {}
     virtual ~Command() {
-        for (auto a : *args) delete a;
-        delete args;
+        if (args) {
+            for (auto a : *args) delete a;
+            delete args;
+        }
     }
     virtual void execute(Environment& env, int inputFd = 0, int outputFd = 1) = 0;
     void execute(Environment& env) override { execute(env, 0, 1); }

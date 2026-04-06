@@ -27,14 +27,6 @@ jobs:
       - name: Check code formatting
         run: |
           find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h' | xargs clang-format -style=file --dry-run --Werror
-      - name: Static analysis with cppcheck
-        run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem \
-            --suppress=unusedFunction \
-            --suppress=unmatchedSuppression \
-            --inline-suppr \
-            --error-exitcode=1 \
-            src/ tests/
       - name: Configure CMake
         run: |
           mkdir -p build
@@ -44,6 +36,17 @@ jobs:
         run: |
           cd build
           make -j$(nproc)
+      - name: Static analysis with cppcheck
+        run: |
+          cppcheck --enable=all \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction \
+            --suppress=unmatchedSuppression \
+            --inline-suppr \
+            --error-exitcode=1 \
+            -I src/ \
+            -I build/ \
+            src/ tests/
       - name: Run tests
         run: |
           cd build

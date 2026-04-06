@@ -262,7 +262,7 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     args.insert(args.begin(), command);
 
     std::vector<char*> argv;
-    argv.reserve(args.size() + 1);  // опционально: избегаем лишних перевыделений памяти
+    argv.reserve(args.size() + 1);
     std::transform(args.begin(), args.end(), std::back_inserter(argv),
                    [](auto& arg) { return const_cast<char*>(arg.c_str()); });
     argv.push_back(nullptr);

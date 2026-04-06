@@ -6,6 +6,11 @@
 #include "environment.hpp"
 
 void Assignment::execute(Environment& env) {
+    if (!args) {
+        env.set(varName, "");
+        return;
+    }
+
     if (args->empty()) {
         env.set(varName, "");
         return;
