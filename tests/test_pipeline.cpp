@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -10,7 +9,6 @@
 class PipelineTest : public ::testing::Test {
    protected:
     void SetUp() override {
-        // Создаем временный файл для тестов
         testFile = "test_pipeline_temp.txt";
         std::ofstream file(testFile);
         file << "apple\n";
@@ -55,7 +53,7 @@ TEST_F(PipelineTest, EchoToGrep) {
     close(stdout_backup);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello World"));
+    EXPECT_NE(output.find("Hello World"), std::string::npos);
 }
 
 TEST_F(PipelineTest, CatToGrep) {
@@ -87,7 +85,7 @@ TEST_F(PipelineTest, CatToGrep) {
     close(stdout_backup);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("banana"));
+    EXPECT_NE(output.find("banana"), std::string::npos);
 }
 
 TEST_F(PipelineTest, ThreeCommandPipeline) {
@@ -122,14 +120,11 @@ TEST_F(PipelineTest, ThreeCommandPipeline) {
     close(stdout_backup);
 
     std::string output(buffer);
-    // apple, banana, date содержат 'a'
-    EXPECT_THAT(output, ::testing::HasSubstr("3"));
+    EXPECT_NE(output.find("3"), std::string::npos);
 }
 
 TEST_F(PipelineTest, EmptyPipeline) {
     Pipeline pipeline({});
-
-    // Не должно упасть
     pipeline.execute(env);
     SUCCEED();
 }
@@ -162,6 +157,6 @@ TEST_F(PipelineTest, EchoToWc) {
     close(stdout_backup);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("1"));  // 1 line
-    EXPECT_THAT(output, ::testing::HasSubstr("5"));  // 5 words
+    EXPECT_NE(output.find("1"), std::string::npos);
+    EXPECT_NE(output.find("5"), std::string::npos);
 }

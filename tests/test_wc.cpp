@@ -1,5 +1,3 @@
-// tests/test_wc.cpp
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -59,8 +57,8 @@ TEST_F(WcCommandTest, WithFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("5"));
-    EXPECT_THAT(output, ::testing::HasSubstr(testFile));
+    EXPECT_NE(output.find("5"), std::string::npos);
+    EXPECT_NE(output.find(testFile), std::string::npos);
 }
 
 TEST_F(WcCommandTest, WithEmptyFile) {
@@ -81,8 +79,8 @@ TEST_F(WcCommandTest, WithEmptyFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("0 0 0"));
-    EXPECT_THAT(output, ::testing::HasSubstr(emptyFile));
+    EXPECT_NE(output.find("0 0 0"), std::string::npos);
+    EXPECT_NE(output.find(emptyFile), std::string::npos);
 }
 
 TEST_F(WcCommandTest, WithSingleLineFile) {
@@ -103,8 +101,8 @@ TEST_F(WcCommandTest, WithSingleLineFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("1"));
-    EXPECT_THAT(output, ::testing::HasSubstr("7"));
+    EXPECT_NE(output.find("1"), std::string::npos);
+    EXPECT_NE(output.find("7"), std::string::npos);
 }
 
 TEST_F(WcCommandTest, WithoutArguments) {
@@ -131,8 +129,8 @@ TEST_F(WcCommandTest, WithoutArguments) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("3"));
-    EXPECT_THAT(output, ::testing::HasSubstr("6"));
+    EXPECT_NE(output.find("3"), std::string::npos);
+    EXPECT_NE(output.find("6"), std::string::npos);
 }
 
 TEST_F(WcCommandTest, WithNonExistentFile) {
@@ -153,7 +151,7 @@ TEST_F(WcCommandTest, WithNonExistentFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("No such file"));
+    EXPECT_NE(output.find("No such file"), std::string::npos);
 }
 
 TEST_F(WcCommandTest, WithMultipleFiles) {
@@ -175,6 +173,6 @@ TEST_F(WcCommandTest, WithMultipleFiles) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr(testFile));
-    EXPECT_THAT(output, ::testing::HasSubstr(singleLineFile));
+    EXPECT_NE(output.find(testFile), std::string::npos);
+    EXPECT_NE(output.find(singleLineFile), std::string::npos);
 }

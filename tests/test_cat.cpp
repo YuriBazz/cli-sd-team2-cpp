@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -57,9 +56,9 @@ TEST_F(CatCommandTest, WithExistingFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("This is a test file"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello again"));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("This is a test file"), std::string::npos);
+    EXPECT_NE(output.find("Hello again"), std::string::npos);
 }
 
 TEST_F(CatCommandTest, WithMultipleFiles) {
@@ -81,8 +80,8 @@ TEST_F(CatCommandTest, WithMultipleFiles) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Привет мир"));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("Привет мир"), std::string::npos);
 }
 
 TEST_F(CatCommandTest, WithNonExistentFile) {
@@ -103,7 +102,7 @@ TEST_F(CatCommandTest, WithNonExistentFile) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("No such file or directory"));
+    EXPECT_NE(output.find("No such file or directory"), std::string::npos);
 }
 
 TEST_F(CatCommandTest, WithoutArguments) {

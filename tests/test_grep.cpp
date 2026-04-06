@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -60,10 +59,10 @@ TEST_F(GrepCommandTest, BasicSearch) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello again"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Another line with Hello"));
-    EXPECT_THAT(output, ::testing::Not(::testing::HasSubstr("This is a test file")));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("Hello again"), std::string::npos);
+    EXPECT_NE(output.find("Another line with Hello"), std::string::npos);
+    EXPECT_EQ(output.find("This is a test file"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, CaseInsensitive) {
@@ -86,9 +85,9 @@ TEST_F(GrepCommandTest, CaseInsensitive) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("hello lowercase"));
-    EXPECT_THAT(output, ::testing::HasSubstr("HELLO UPPERCASE"));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("hello lowercase"), std::string::npos);
+    EXPECT_NE(output.find("HELLO UPPERCASE"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, CountMatches) {
@@ -111,7 +110,7 @@ TEST_F(GrepCommandTest, CountMatches) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("3"));  // Hello appears 3 times
+    EXPECT_NE(output.find("3"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, ListFilesWithMatch) {
@@ -134,8 +133,8 @@ TEST_F(GrepCommandTest, ListFilesWithMatch) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr(testFile));
-    EXPECT_THAT(output, ::testing::Not(::testing::HasSubstr("Hello world")));
+    EXPECT_NE(output.find(testFile), std::string::npos);
+    EXPECT_EQ(output.find("Hello world"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, WordBoundary) {
@@ -158,10 +157,9 @@ TEST_F(GrepCommandTest, WordBoundary) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello again"));
-    // "Another line with Hello" contains Hello as separate word too
-    EXPECT_THAT(output, ::testing::HasSubstr("Another line with Hello"));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("Hello again"), std::string::npos);
+    EXPECT_NE(output.find("Another line with Hello"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, ContextLines) {
@@ -185,10 +183,10 @@ TEST_F(GrepCommandTest, ContextLines) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Line 2 with pattern"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Line 3"));  // context line
-    EXPECT_THAT(output, ::testing::HasSubstr("Line 4 with pattern again"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Line 5"));  // context line
+    EXPECT_NE(output.find("Line 2 with pattern"), std::string::npos);
+    EXPECT_NE(output.find("Line 3"), std::string::npos);
+    EXPECT_NE(output.find("Line 4 with pattern again"), std::string::npos);
+    EXPECT_NE(output.find("Line 5"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, WithoutPattern) {
@@ -208,7 +206,7 @@ TEST_F(GrepCommandTest, WithoutPattern) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("missing pattern"));
+    EXPECT_NE(output.find("missing pattern"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, WithStdin) {
@@ -236,9 +234,9 @@ TEST_F(GrepCommandTest, WithStdin) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("This is a test line"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Third test line"));
-    EXPECT_THAT(output, ::testing::Not(::testing::HasSubstr("Another line without")));
+    EXPECT_NE(output.find("This is a test line"), std::string::npos);
+    EXPECT_NE(output.find("Third test line"), std::string::npos);
+    EXPECT_EQ(output.find("Another line without"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, MultipleFiles) {
@@ -261,8 +259,8 @@ TEST_F(GrepCommandTest, MultipleFiles) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr(testFile + ":Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr(testFile + ":Hello again"));
+    EXPECT_NE(output.find(testFile + ":Hello world"), std::string::npos);
+    EXPECT_NE(output.find(testFile + ":Hello again"), std::string::npos);
 }
 
 TEST_F(GrepCommandTest, ComplexPattern) {
@@ -284,6 +282,6 @@ TEST_F(GrepCommandTest, ComplexPattern) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello world"));
-    EXPECT_THAT(output, ::testing::HasSubstr("Hello again"));
+    EXPECT_NE(output.find("Hello world"), std::string::npos);
+    EXPECT_NE(output.find("Hello again"), std::string::npos);
 }

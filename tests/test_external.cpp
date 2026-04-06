@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -37,7 +36,7 @@ TEST_F(ExternalCommandTest, LsCommand) {
         close(pipefd[0]);
 
         std::string output(buffer);
-        EXPECT_THAT(output, ::testing::HasSubstr("bash_tests"));
+        EXPECT_NE(output.find("bash_tests"), std::string::npos);
     }
 }
 
@@ -63,7 +62,7 @@ TEST_F(ExternalCommandTest, EchoCommand) {
         close(pipefd[0]);
 
         std::string output(buffer);
-        EXPECT_THAT(output, ::testing::HasSubstr("Hello from external"));
+        EXPECT_NE(output.find("Hello from external"), std::string::npos);
     }
 }
 
@@ -95,7 +94,7 @@ TEST_F(ExternalCommandTest, NonExistentCommand) {
         close(stderr_backup);
 
         std::string output(buffer);
-        EXPECT_THAT(output, ::testing::HasSubstr("failed"));
+        EXPECT_NE(output.find("failed"), std::string::npos);
         EXPECT_TRUE(WIFEXITED(status));
         EXPECT_EQ(WEXITSTATUS(status), 127);
     }
@@ -126,7 +125,7 @@ TEST_F(ExternalCommandTest, WithArgumentsAndVariables) {
         close(pipefd[0]);
 
         std::string output(buffer);
-        EXPECT_THAT(output, ::testing::HasSubstr("Variable value: test_value"));
+        EXPECT_NE(output.find("Variable value: test_value"), std::string::npos);
     }
 }
 
@@ -153,7 +152,7 @@ TEST_F(ExternalCommandTest, PwdCommand) {
         std::string output(buffer);
         char cwd[1024];
         getcwd(cwd, sizeof(cwd));
-        EXPECT_THAT(output, ::testing::HasSubstr(cwd));
+        EXPECT_NE(output.find(cwd), std::string::npos);
     }
 }
 
@@ -185,7 +184,7 @@ TEST_F(ExternalCommandTest, CatCommand) {
         close(pipefd[0]);
 
         std::string output(buffer);
-        EXPECT_THAT(output, ::testing::HasSubstr("cmake_minimum_required"));
+        EXPECT_NE(output.find("cmake_minimum_required"), std::string::npos);
     }
 
     unlink(testFile.c_str());

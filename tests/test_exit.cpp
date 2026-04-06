@@ -1,4 +1,3 @@
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
 
@@ -28,7 +27,7 @@ TEST_F(ExitCommandTest, SetsExitFlag) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("exit"));
+    EXPECT_NE(output.find("exit"), std::string::npos);
 }
 
 TEST_F(ExitCommandTest, WithArguments) {
@@ -51,7 +50,7 @@ TEST_F(ExitCommandTest, WithArguments) {
     close(pipefd[0]);
 
     std::string output(buffer);
-    EXPECT_THAT(output, ::testing::HasSubstr("exit"));
+    EXPECT_NE(output.find("exit"), std::string::npos);
 }
 
 TEST_F(ExitCommandTest, EmptyArguments) {
