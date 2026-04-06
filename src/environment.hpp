@@ -15,6 +15,7 @@ class Environment {
     void loadEnv();
     bool shouldExit() const { return exitFlag; }
     void setExit(bool flag) { exitFlag = flag; }
+    std::unordered_map<std::string, std::string>& getVariables() { return variables; }
     const std::unordered_map<std::string, std::string>& getVariables() const { return variables; }
 
    private:

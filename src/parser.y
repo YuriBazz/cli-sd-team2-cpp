@@ -1,6 +1,6 @@
 %{
-#include "src/ast.hpp"
-#include "src/executor.hpp"
+#include "ast.hpp"
+#include "executor.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -13,7 +13,7 @@ extern Executor* g_executor;
 %}
 
 %code requires {
-    #include "src/ast.hpp"
+    #include "ast.hpp"
 }
 
 %union {
