@@ -1,14 +1,45 @@
-add_executable(bash_tests
-    test_main.cpp
-    test_module1.cpp
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.14.0
 )
 
-target_link_libraries(bash_tests PRIVATE ${PROJECT_NAME})
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(bash_tests
+    test_cat.cpp
+    test_echo.cpp
+    test_wc.cpp
+    test_pwd.cpp
+    test_grep.cpp
+    test_assignment.cpp
+    test_pipeline.cpp
+    test_external.cpp
+    test_environment.cpp
+    test_exit.cpp
+)
+
+target_link_libraries(bash_tests
+    bash_lib
+    gtest_main
+    gmock
+    pthread
+)
 
 target_include_directories(bash_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
+    ${CMAKE_BINARY_DIR}
 )
 
-add_test(NAME Module1Test COMMAND bash_tests --gtest_filter=Module1.*)
-add_test(NAME Module2Test COMMAND bash_tests --gtest_filter=Module2.*)
-add_test(NAME AllTests COMMAND bash_tests)
+target_compile_options(bash_tests PRIVATE
+    -Wall -Wextra
+    -Wno-sign-compare -Wno-unused-parameter
+)
+
+include(GoogleTest)
+gtest_discover_tests(bash_tests)

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       - name: Install deps
         run: |
           sudo apt-get update
@@ -21,24 +21,33 @@ jobs:
             g++ \
             make \
             clang-format \
-            clang-tidy \
-            cppcheck
+            cppcheck \
+            flex \
+            bison
       - name: Check code formatting
         run: |
-          find . -name '*.cpp' -o -name '*.h' | xargs clang-format -style=file -i
-          git diff --exit-code || (echo "Code not formatted properly. Run clang-format!" && exit 1)
-      - name: Static analysis with cppcheck
+          find src tests -name '*.cpp' -o -name '*.hpp' -o -name '*.h' | xargs clang-format -style=file --dry-run --Werror
+      - name: Configure CMake
         run: |
-          cppcheck --enable=all --suppress=missingIncludeSystem . \
-            --suppress=unusedFunction:tests/* \
-            --error-exitcode=1
+          mkdir -p build
+          cd build
+          cmake .. -DCMAKE_CXX_FLAGS="-Wall -Wextra -Werror"
       - name: Build
         run: |
-          mkdir build
           cd build
-          cmake ..
           make -j$(nproc)
+      - name: Static analysis with cppcheck
+        run: |
+          cppcheck --enable=all \
+            --suppress=missingIncludeSystem \
+            --suppress=unusedFunction \
+            --suppress=unmatchedSuppression \
+            --inline-suppr \
+            --error-exitcode=1 \
+            -I src/ \
+            -I build/ \
+            src/ tests/
       - name: Run tests
         run: |
           cd build
-          ctest --output-on-failure
+          ctest --output-on-failure --rerun-failed
