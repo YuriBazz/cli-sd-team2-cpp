@@ -320,7 +320,8 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
 
     std::vector<std::string> expandedArgs;
     if (args) {
-        for (auto arg : *args) {
+        expandedArgs.reserve(args->size());
+        for (const auto arg : *args) {
             expandedArgs.push_back(env.expand(arg));
         }
     }

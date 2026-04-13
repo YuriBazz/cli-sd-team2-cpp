@@ -17,7 +17,7 @@ void Assignment::execute(Environment& env) {
     }
 
     std::string value;
-    for (auto arg : *args) {
+    for (const auto arg : *args) {
         std::string expanded = env.expand(arg);
         if (!value.empty()) value += " ";
         value += expanded;

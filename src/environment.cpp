@@ -43,7 +43,7 @@ std::string Environment::expand(const Argument* arg) const {
     }
     if (arg->type == Argument::COMPOSITE) {
         std::string result;
-        for (auto part : arg->parts) {
+        for (const auto part : arg->parts) {
             result += expand(part);
         }
         return result;
