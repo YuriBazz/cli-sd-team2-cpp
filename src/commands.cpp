@@ -5,6 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <regex>
 #include <sstream>
 #include <vector>
@@ -321,9 +322,8 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     std::vector<std::string> expandedArgs;
     if (args) {
         expandedArgs.reserve(args->size());
-        for (const auto* arg : *args) {
-            expandedArgs.push_back(env.expand(arg));
-        }
+        std::transform(args->begin(), args->end(), std::back_inserter(expandedArgs),
+                       [&env](const Argument* arg) { return env.expand(arg); });
     }
 
     std::string cmdPath = findInPath(expandedCommand, env);
@@ -333,9 +333,8 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
 
     std::vector<char*> argv;
     argv.reserve(expandedArgs.size() + 1);
-    for (size_t i = 0; i < expandedArgs.size(); ++i) {
-        argv.push_back(const_cast<char*>(expandedArgs[i].c_str()));
-    }
+    std::transform(expandedArgs.begin(), expandedArgs.end(), std::back_inserter(argv),
+                   [](std::string& s) { return const_cast<char*>(s.c_str()); });
     argv.push_back(nullptr);
 
     if (inputFd != 0) {
