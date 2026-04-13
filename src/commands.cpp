@@ -15,8 +15,18 @@
 static std::vector<std::string> expandArgs(const ArgumentList* args, const Environment& env) {
     std::vector<std::string> result;
     if (!args) return result;
-    std::transform(args->begin(), args->end(), std::back_inserter(result),
-                   [&](const auto* arg) { return env.expand(arg); });
+    for (const auto* arg : *args) {
+        std::string expanded = env.expand(arg);
+        if (arg->type == Argument::VARIABLE) {
+            std::istringstream iss(expanded);
+            std::string word;
+            while (iss >> word) {
+                result.push_back(word);
+            }
+        } else {
+            result.push_back(expanded);
+        }
+    }
     return result;
 }
 
@@ -124,8 +134,18 @@ void PwdCommand::execute(Environment& env, int inputFd, int outputFd) {
 }
 
 void ExitCommand::execute(Environment& env, int inputFd, int outputFd) {
-    env.setExit(true);
+    int code = 0;
+    if (args && !args->empty()) {
+        std::string codeStr = env.expand(args->front());
+        try {
+            code = std::stoi(codeStr);
+        } catch (...) {
+            code = 0;
+        }
+    }
     write(outputFd, "exit\n", 5);
+    env.setExit(true, code);
+    exit(code);
 }
 
 void GrepCommand::execute(Environment& env, int inputFd, int outputFd) {
@@ -257,14 +277,64 @@ void GrepCommand::execute(Environment& env, int inputFd, int outputFd) {
     }
 }
 
+std::string ExternalCommand::findInPath(const std::string& cmd, const Environment& env) {
+    if (cmd.find('/') != std::string::npos) {
+        if (access(cmd.c_str(), X_OK) == 0) return cmd;
+        return "";
+    }
+
+    std::string pathEnv = env.get("PATH");
+    if (pathEnv.empty()) pathEnv = getenv("PATH") ? getenv("PATH") : "";
+
+    size_t start = 0;
+    size_t end;
+    while ((end = pathEnv.find(':', start)) != std::string::npos) {
+        std::string dir = pathEnv.substr(start, end - start);
+        if (!dir.empty()) {
+            std::string fullPath = dir + "/" + cmd;
+            if (access(fullPath.c_str(), X_OK) == 0) return fullPath;
+        }
+        start = end + 1;
+    }
+    if (start < pathEnv.length()) {
+        std::string dir = pathEnv.substr(start);
+        if (!dir.empty()) {
+            std::string fullPath = dir + "/" + cmd;
+            if (access(fullPath.c_str(), X_OK) == 0) return fullPath;
+        }
+    }
+    return "";
+}
+
 void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
-    std::vector<std::string> args = expandArgs(this->args, env);
-    args.insert(args.begin(), command);
+    std::string expandedCommand;
+    if (!command.empty() && command[0] == '$') {
+        std::string varName = command.substr(1);
+        expandedCommand = env.get(varName);
+        if (expandedCommand.empty()) {
+            expandedCommand = command;
+        }
+    } else {
+        expandedCommand = command;
+    }
+
+    std::vector<std::string> expandedArgs;
+    if (args) {
+        for (auto arg : *args) {
+            expandedArgs.push_back(env.expand(arg));
+        }
+    }
+
+    std::string cmdPath = findInPath(expandedCommand, env);
+    if (cmdPath.empty()) cmdPath = expandedCommand;
+
+    expandedArgs.insert(expandedArgs.begin(), cmdPath);
 
     std::vector<char*> argv;
-    argv.reserve(args.size() + 1);
-    std::transform(args.begin(), args.end(), std::back_inserter(argv),
-                   [](auto& arg) { return const_cast<char*>(arg.c_str()); });
+    argv.reserve(expandedArgs.size() + 1);
+    for (auto& arg : expandedArgs) {
+        argv.push_back(const_cast<char*>(arg.c_str()));
+    }
     argv.push_back(nullptr);
 
     if (inputFd != 0) {
@@ -282,7 +352,7 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
 
     execvp(argv[0], argv.data());
 
-    std::string err = "external command failed: " + command + "\n";
+    std::string err = "external command failed: " + expandedCommand + "\n";
     write(STDERR_FILENO, err.c_str(), err.size());
     exit(127);
 }

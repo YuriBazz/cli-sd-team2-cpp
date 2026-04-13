@@ -14,5 +14,5 @@ int main() {
     yyin = stdin;
     yyparse();
 
-    return 0;
+    return env.getExitCode();
 }

@@ -7,11 +7,17 @@
 class Environment;
 
 struct Argument {
-    enum Type { WORD, STRING, VARIABLE };
+    enum Type { WORD, STRING, VARIABLE, COMPOSITE };
     Type type;
     std::string value;
+    std::vector<Argument*> parts;
     Argument(Type t, const char* v) : type(t), value(v ? v : "") {}
-    virtual ~Argument() = default;
+    Argument(Type t, const std::vector<Argument*>& p) : type(t), parts(p) {}
+    ~Argument() {
+        if (type == COMPOSITE) {
+            for (auto p : parts) delete p;
+        }
+    }
 };
 
 using ArgumentList = std::vector<Argument*>;
@@ -103,6 +109,7 @@ class ExternalCommand : public Command {
 
    private:
     std::string command;
+    std::string findInPath(const std::string& cmd, const Environment& env);
 };
 
 #endif

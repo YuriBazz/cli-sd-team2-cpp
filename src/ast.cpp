@@ -21,10 +21,8 @@ void Assignment::execute(Environment& env) {
         std::string expanded = env.expand(arg);
         if (!value.empty()) value += " ";
         value += expanded;
-        delete arg;
     }
     env.set(varName, value);
-    args->clear();
 }
 
 void Pipeline::execute(Environment& env) {
@@ -33,6 +31,8 @@ void Pipeline::execute(Environment& env) {
 
     int prevFd = 0;
     int pipefd[2];
+    std::vector<pid_t> children;
+    int last_status = 0;
 
     for (size_t i = 0; i < commands.size(); ++i) {
         if (dynamic_cast<ExitCommand*>(commands[i])) {
@@ -62,6 +62,7 @@ void Pipeline::execute(Environment& env) {
             commands[i]->execute(env, 0, 1);
             exit(0);
         } else if (pid > 0) {
+            children.push_back(pid);
             if (prevFd != 0) close(prevFd);
             if (outputFd != 1) close(outputFd);
             prevFd = pipefd[0];
@@ -70,7 +71,14 @@ void Pipeline::execute(Environment& env) {
             return;
         }
     }
-    for (size_t i = 0; i < commands.size(); ++i) {
-        wait(nullptr);
+
+    for (pid_t pid : children) {
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)) {
+            last_status = WEXITSTATUS(status);
+        }
     }
+
+    env.setLastExitCode(last_status);
 }
