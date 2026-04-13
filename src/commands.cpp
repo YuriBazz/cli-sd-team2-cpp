@@ -321,7 +321,7 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     std::vector<std::string> expandedArgs;
     if (args) {
         expandedArgs.reserve(args->size());
-        for (const auto arg : *args) {
+        for (const auto* arg : *args) {
             expandedArgs.push_back(env.expand(arg));
         }
     }
@@ -333,8 +333,8 @@ void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
 
     std::vector<char*> argv;
     argv.reserve(expandedArgs.size() + 1);
-    for (auto& arg : expandedArgs) {
-        argv.push_back(const_cast<char*>(arg.c_str()));
+    for (size_t i = 0; i < expandedArgs.size(); ++i) {
+        argv.push_back(const_cast<char*>(expandedArgs[i].c_str()));
     }
     argv.push_back(nullptr);
 
