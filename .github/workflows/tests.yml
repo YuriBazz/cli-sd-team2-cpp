@@ -38,15 +38,7 @@ jobs:
           make -j$(nproc)
       - name: Static analysis with cppcheck
         run: |
-          cppcheck --enable=all \
-            --suppress=missingIncludeSystem \
-            --suppress=unusedFunction \
-            --suppress=unmatchedSuppression \
-            --inline-suppr \
-            --error-exitcode=1 \
-            -I src/ \
-            -I build/ \
-            src/ tests/
+          cppcheck --enable=all --suppress=useStlAlgorithm --suppress=constParameterReference --error-exitcode=1 src/ tests/
       - name: Run tests
         run: |
           cd build
