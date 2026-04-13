@@ -1,9 +1,10 @@
 #include "environment.hpp"
 
+#include <unistd.h>
+
 #include <cstdlib>
 #include <cstring>
 #include <sstream>
-#include <unistd.h>
 
 Environment::Environment() { loadEnv(); }
 

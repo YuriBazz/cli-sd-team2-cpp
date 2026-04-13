@@ -15,7 +15,10 @@ class Environment {
     std::string expandToString(const Argument* arg) const;
     void loadEnv();
     bool shouldExit() const { return exitFlag; }
-    void setExit(bool flag, int code = 0) { exitFlag = flag; exitCode = code; }
+    void setExit(bool flag, int code = 0) {
+        exitFlag = flag;
+        exitCode = code;
+    }
     int getExitCode() const { return exitCode; }
     int getLastExitCode() const { return lastExitCode; }
     void setLastExitCode(int code) { lastExitCode = code; }
