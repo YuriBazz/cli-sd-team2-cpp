@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -18,15 +19,7 @@ static std::vector<std::string> expandArgs(const ArgumentList* args, const Envir
     if (!args) return result;
     for (const auto* arg : *args) {
         std::string expanded = env.expand(arg);
-        if (arg->type == Argument::VARIABLE) {
-            std::istringstream iss(expanded);
-            std::string word;
-            while (iss >> word) {
-                result.push_back(word);
-            }
-        } else {
-            result.push_back(expanded);
-        }
+        result.push_back(expanded);
     }
     return result;
 }
