@@ -107,7 +107,6 @@ command:
     | TOKEN_PWD optional_spaces argument_list   { $$ = new PwdCommand($3); free($1); }
     | TOKEN_EXIT optional_spaces argument_list  { $$ = new ExitCommand($3); free($1); }
     | TOKEN_GREP optional_spaces argument_list  { $$ = new GrepCommand($3); free($1); }
-    | TOKEN_LS optional_spaces argument_list    { $$ = new LsCommand($3); free($1); }
     | WORD optional_spaces argument_list        {
         $$ = new ExternalCommand($1, $3);
         free($1);
@@ -176,7 +175,6 @@ atom:
     | TOKEN_PWD   { $$ = new Argument(Argument::WORD, $1); free($1); }
     | TOKEN_EXIT  { $$ = new Argument(Argument::WORD, $1); free($1); }
     | TOKEN_GREP  { $$ = new Argument(Argument::WORD, $1); free($1); }
-    | TOKEN_LS    { $$ = new Argument(Argument::WORD, $1); free($1); }
     ;
 
 %%
