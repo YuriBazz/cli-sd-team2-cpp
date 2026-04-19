@@ -102,6 +102,12 @@ class GrepCommand : public Command {
     void execute(Environment& env, int inputFd, int outputFd) override;
 };
 
+class LsCommand : public Command {
+   public:
+    void execute(Environment& env, int inputFd, int outputFd) override;
+    explicit LsCommand(ArgumentList* a) : Command(a) {}
+};
+
 class ExternalCommand : public Command {
    public:
     ExternalCommand(const std::string& cmd, ArgumentList* a) : Command(a), command(cmd) {}

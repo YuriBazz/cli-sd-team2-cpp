@@ -25,14 +25,12 @@ class Environment {
     void setLastExitCode(int code) { lastExitCode = code; }
     std::unordered_map<std::string, std::string>& getVariables() { return variables; }
     const std::unordered_map<std::string, std::string>& getVariables() const { return variables; }
-    const std::filesystem::path& getCurrentPath() const { return current_path; }
 
    private:
     std::unordered_map<std::string, std::string> variables;
     bool exitFlag = false;
     int exitCode = 0;
     int lastExitCode = 0;
-    std::filesystem::path current_path = std::filesystem::current_path();
 };
 
 #endif

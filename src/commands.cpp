@@ -300,6 +300,75 @@ std::string ExternalCommand::findInPath(const std::string& cmd, const Environmen
     return "";
 }
 
+void LsCommand::execute(Environment& env, int inputFd, int outputFd) {
+    namespace fs = std::filesystem;
+    auto args = expandArgs(this->args, env);
+    fs::path current_path = std::filesystem::current_path();
+    if (args.empty()) {
+        bool first = true;
+        for (const auto& dir_entry : fs::directory_iterator{current_path}) {
+            auto to_write = (first ? "" : " ") + dir_entry.path().filename().string();
+            first = false;
+            write(outputFd, to_write.c_str(), to_write.size());
+        }
+        write(outputFd, "\n", 1);
+        return;
+    }
+
+    std::vector<fs::path> files;
+    std::vector<fs::path> directories;
+    bool has_errors = false;
+
+    for (const auto& arg_str : args) {
+        fs::path p(arg_str);
+        if (!fs::exists(p)) {
+            std::string error = "ls: Невозможно получить доступ к '" + arg_str +
+                                "': Нет такого файла или каталога\n";
+            write(outputFd, error.c_str(), error.size());
+            has_errors = true;
+            continue;
+        }
+        (fs::is_directory(p) ? directories : files).push_back(p);
+    }
+
+    bool written = false;
+    for (const auto& file_path : files) {
+        std::string to_write = (written ? " " : "") + file_path.string();
+        write(outputFd, to_write.c_str(), to_write.size());
+        written = true;
+    }
+    if (written) {
+        write(outputFd, "\n", 1);
+    }
+
+    bool multiple = (files.size() + directories.size()) > 1;
+
+    for (size_t i = 0; i < directories.size(); ++i) {
+        if (written || i > 0 || has_errors) {
+            write(outputFd, "\n", 1);
+        }
+        if (multiple) {
+            std::string header = directories[i].string() + ":\n";
+            write(outputFd, header.c_str(), header.size());
+        }
+
+        bool dir_written = false;
+        try {
+            for (const auto& dir_entry : fs::directory_iterator{directories[i]}) {
+                std::string result =
+                    (dir_written ? " " : "") + dir_entry.path().filename().string();
+                dir_written = true;
+                write(outputFd, result.c_str(), result.size());
+            }
+            write(outputFd, "\n", 1);
+        } catch (const fs::filesystem_error& e) {
+            std::string err = "ls: Невозможно получить доступ к '" + directories[i].string() +
+                              "': " + e.code().message() + "\n";
+            write(outputFd, err.c_str(), err.size());
+        }
+    }
+}
+
 void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     std::string expandedCommand;
     if (!command.empty() && command[0] == '$') {
