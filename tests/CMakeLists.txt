@@ -23,6 +23,7 @@ add_executable(bash_tests
     test_environment.cpp
     test_exit.cpp
     test_ls.cpp
+    test_cd.cpp
 )
 
 target_link_libraries(bash_tests
