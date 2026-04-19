@@ -42,6 +42,11 @@ void Pipeline::execute(Environment& env) {
     int last_status = 0;
 
     for (size_t i = 0; i < commands.size(); ++i) {
+        if (dynamic_cast<ExitCommand*>(commands[i])) {
+            commands[i]->execute(env, 0, 1);
+            return;
+        }
+
         int outputFd = 1;
         if (i < commands.size() - 1) {
             if (pipe(pipefd) == -1) {
