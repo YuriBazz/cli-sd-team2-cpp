@@ -27,7 +27,7 @@ extern Executor* g_executor;
 }
 
 %token <str> WORD STRING VARIABLE STRING_SEGMENT WORD_ASSIGN
-%token <str> TOKEN_CAT TOKEN_ECHO TOKEN_WC TOKEN_PWD TOKEN_EXIT TOKEN_GREP TOKEN_LS
+%token <str> TOKEN_CAT TOKEN_ECHO TOKEN_WC TOKEN_PWD TOKEN_EXIT TOKEN_GREP TOKEN_LS TOKEN_CD
 %token SPACE
 %token <num> NUMBER
 %token PIPE SEMICOLON ASSIGN NEWLINE
@@ -108,6 +108,7 @@ command:
     | TOKEN_EXIT optional_spaces argument_list  { $$ = new ExitCommand($3); free($1); }
     | TOKEN_GREP optional_spaces argument_list  { $$ = new GrepCommand($3); free($1); }
     | TOKEN_LS optional_spaces argument_list    { $$ = new LsCommand($3); free($1); }
+    | TOKEN_CD optional_spaces argument_list    { $$ = new CdCommand($3); free($1); }
     | WORD optional_spaces argument_list        {
         $$ = new ExternalCommand($1, $3);
         free($1);
@@ -177,6 +178,7 @@ atom:
     | TOKEN_EXIT  { $$ = new Argument(Argument::WORD, $1); free($1); }
     | TOKEN_GREP  { $$ = new Argument(Argument::WORD, $1); free($1); }
     | TOKEN_LS    { $$ = new Argument(Argument::WORD, $1); free($1); }
+    | TOKEN_CD    { $$ = new Argument(Argument::WORD, $1); free($1); }
     ;
 
 %%

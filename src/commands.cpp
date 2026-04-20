@@ -369,6 +369,40 @@ void LsCommand::execute(Environment& env, int inputFd, int outputFd) {
     }
 }
 
+void CdCommand::execute(Environment& env, int inputFd, int outputFd) {
+    auto args = expandArgs(this->args, env);
+    try {
+        if (args.empty()) {
+            args.emplace_back(env.get("HOME"));
+        }
+        if (args.size() > 1) {
+            std::string error = "cd: too many arguments\n";
+            write(outputFd, error.c_str(), error.size());
+            return;
+        }
+        std::filesystem::path to_go(
+            args[0] == ".." ? std::filesystem::current_path().parent_path().string() : args[0]);
+        if (!std::filesystem::exists(to_go)) {
+            std::string error = "cd: " + to_go.string() + ": no such file or directory\n";
+            write(outputFd, error.c_str(), error.size());
+            return;
+        }
+
+        if (!std::filesystem::is_directory(to_go)) {
+            std::string error = "cd: " + to_go.string() + ": not a directory\n";
+            write(outputFd, error.c_str(), error.size());
+            return;
+        }
+        if (chdir(to_go.c_str()) < 0) {
+            std::string error = "cd: permission denied\n";
+            write(outputFd, error.c_str(), error.size());
+        }
+    } catch (const std::exception& exc) {
+        std::string error = std::string("cd: ") + exc.what() + "\n";
+        write(outputFd, error.c_str(), error.size());
+    }
+}
+
 void ExternalCommand::execute(Environment& env, int inputFd, int outputFd) {
     std::string expandedCommand;
     if (!command.empty() && command[0] == '$') {

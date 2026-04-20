@@ -42,6 +42,7 @@ int string_len;
 "exit"          { yylval.str = strdup(yytext); return TOKEN_EXIT; }
 "grep"          { yylval.str = strdup(yytext); return TOKEN_GREP; }
 "ls"            { yylval.str = strdup(yytext); return TOKEN_LS; }
+"cd"            { yylval.str = strdup(yytext); return TOKEN_CD; }
 
 [a-zA-Z_][a-zA-Z0-9_]*  {
     yylval.str = strdup(yytext);
